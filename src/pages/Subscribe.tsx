@@ -2,34 +2,30 @@ import { gql, useMutation } from "@apollo/client";
 import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
+import { useCreateSubscriberMutation } from "../graphql/generated";
 
-const CREATE_SUBSCRIBE_MUTATION = gql`
-mutation CreateSubscriber ($name: String!, $email: String!){
-  createSubscriber(data: {name: $name, email: $email}){
-    id
-  }
-}
-`
 
 export function Subscribe(){
-const navigate = useNavigate();
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [createSubscriber, {data}] = useMutation(CREATE_SUBSCRIBE_MUTATION);
+
+  const [createSubscriber, {loading}] = useCreateSubscriberMutation();
   
   
   async function handleSubscribe(event : FormEvent){
   event.preventDefault();
 
   await createSubscriber({
-    variables:{
+    variables: {
       name, 
-      email,
+      email
     }
-  });
+  } )
+  
   navigate('/event');
   }
-
 
   return (
   <div className="min-h-screen bg-blur bg-cover bg-no-repeat flex flex-col items-center" > 
@@ -58,7 +54,8 @@ const navigate = useNavigate();
           />
 
           <button type="submit"
-            className="mt-4 bg-green-500 uppercase py-4 rounded font-bold text-sm hover:bg-green-700 transition-colors"
+            disabled={loading}
+            className="mt-4 bg-green-500 uppercase py-4 rounded font-bold text-sm hover:bg-green-700 transition-colors disabled:opacity-50"
           >
             Garantir Vaga
           </button>
